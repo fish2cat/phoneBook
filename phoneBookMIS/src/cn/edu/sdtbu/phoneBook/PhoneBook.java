@@ -122,7 +122,7 @@ public class PhoneBook {
 		}
 	}
 	public boolean updateContract(String name, String gender, 
-			String email, String[] phones) {
+			String email, String[] phones) throws Exception {
 		int index = findContract(new Contract(name,gender,email,phones));		
 		if(index <0)
 			return false;

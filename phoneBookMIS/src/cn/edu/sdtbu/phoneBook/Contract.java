@@ -2,8 +2,28 @@ package cn.edu.sdtbu.phoneBook;
 
 import java.text.Collator;
 import java.util.Arrays;
-
-public class Contract {
+import java.util.regex.Pattern;
+class NameException extends Exception{
+	public NameException() {
+		super("姓名为空");
+	}	
+}
+class GenderException extends Exception{
+	public GenderException() {
+		super("性别格式错误");
+	}	
+}
+class EmailException extends Exception{
+	public EmailException() {
+		super("邮箱格式错误");
+	}
+}
+class PhoneException extends Exception{
+	public PhoneException() {
+		super("电话号码格式错误");
+	}
+}
+public class Contract{
 	private String name;
 	private String gender;
 	private String email;
@@ -11,39 +31,64 @@ public class Contract {
 	public Contract() {
 		
 	}
-	public Contract(String name, String gender, String email,String[] phones) {
-		setName(name);
-		setGender(gender);
-		setEmail(email);		
-		setPhones(phones);
+	public Contract(String name, String gender, String email,String[] phones){
+		try {
+			setName(name);
+			setGender(gender);
+			setEmail(email);		
+			setPhones(phones);
+		} catch (Exception e) {			
+			e.printStackTrace();
+		}
 	}
-	public Contract(String name, String[] phones) {
+	public Contract(String name, String[] phones){
 		this(name,"","",phones);
 	}	
 	public String getName() {
 		return name;
-	}	
-	public void setName(String name) {
+	}
+	/*
+	 * 姓名不能为空
+	 */
+	public void setName(String name) throws NameException{
 		if(name == null || name.equals(""))
-			return;
+			throw new NameException();
 		this.name = name;
 	}
 	public String getGender() {
 		return gender;
 	}
-	public void setGender(String gender) {
-		this.gender = gender;
+	/*
+	 * 可以为空字符，男或者女之一
+	 */
+	public void setGender(String gender) throws GenderException{
+		if(gender == null || !(gender.equals("男") || gender.equals("女") || gender.equals("")))
+			throw new GenderException();
+		else
+			this.gender = gender;			
 	}
 	public String getEmail() {
 		return email;
 	}	
-	public void setEmail(String email) {
-		this.email = email;
+	public void setEmail(String email) throws EmailException{
+		
+		String regex = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";		
+		if(email != null && (email.equals("") || Pattern.matches(regex, email)))
+			
+				this.email = email;			
+		else
+			throw new EmailException();
+			
 	}
 	public String[] getPhones() {
 		return phones;
 	}	
-	public void setPhones(String[] phones) {		
+	public void setPhones(String[] phones) throws PhoneException{	
+		String telReg = "^(0[1-9]\\d{1,2}\\-)?\\d{7,8}$";
+		String phoneReg = "^1\\d{10}$";
+		for(String phone:phones)
+		if(phone == null || !(Pattern.matches(telReg, phone) || Pattern.matches(phoneReg, phone)))
+			throw new PhoneException();			
 		this.phones = phones;			
 	}	
 	public void display() {
@@ -53,6 +98,26 @@ public class Contract {
 			System.out.print(phones[i]+"\t");			
 		}
 		System.out.println();
+	}
+	public static void main(String[] args) {
+		Contract c;
+		try {
+			c = new Contract("王新明", new String[] {"13602344578","13506334789","010-34567913"});
+		} catch (Exception e) {			
+			e.printStackTrace();
+			return;
+		}
+		c.display();	
+		Contract cNew;
+		try {
+			cNew = new Contract("王新明", new String[] {"13602344578","13506334788","0535-34567914"});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+		c.mergeContract(cNew);
+		c.display();
 	}
 	public int compareTo(Contract o) {		
 		Collator instance = Collator.getInstance(java.util.Locale.CHINA);
@@ -64,9 +129,19 @@ public class Contract {
 	public void mergeContract(Contract o) {
 		if(this.getName().equals(o.getName())) {
 			if(this.getGender().equals("") )
-				this.setGender(o.getGender());
+				try {
+					this.setGender(o.getGender());
+				} catch (GenderException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			if(this.getEmail().equals(""))
-				this.setEmail(o.getEmail());
+				try {
+					this.setEmail(o.getEmail());
+				} catch (EmailException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			/*
 			 * 复制并去重
 			 */
@@ -97,8 +172,4 @@ public class Contract {
 			
 		}
 	}
-	public static void main(String[] args) {
-		Contract c = new Contract("王新明", new String[] {"13602344578","13506334789","010-34567913"});
-		c.display();		
-	}	
 }

@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 
 public class PhoneBookTest {
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		PhoneBook book = new PhoneBook();
 		book.add(new Contract("ÍõÐÂÃ÷", 
