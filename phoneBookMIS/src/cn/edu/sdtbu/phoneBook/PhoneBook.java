@@ -1,7 +1,6 @@
 package cn.edu.sdtbu.phoneBook;
 
-import java.util.Arrays;
-
+import java.util.*;
 /*实现一个通讯录；
 
 通讯录可以用来存储联系人的信息，每个人的信息包括：
@@ -26,112 +25,82 @@ import java.util.Arrays;
 
 */
 public class PhoneBook {	
-	private Contract[] contracts;
+	private List<Contract> contracts;
 	
 	public PhoneBook() {
 		
 	}
-	public PhoneBook(Contract[] contracts) {
+	public PhoneBook(List<Contract> contracts) {
 		setContracts(contracts);
 		
 	}
-	public Contract[] getContracts() {
+	public List<Contract> getContracts() {
 		return contracts;
 	}
-	public void setContracts(Contract[] contracts) {	
-		this.contracts = contracts;			
-		sortContracts();
-	}
-	/*
-	 * 升序排列
-	 */
-	private void sortContracts() {
-		for(int i = 0; i < contracts.length; i++) {
-			int temp = i;
-			for(int j = i+1; j < contracts.length; j++)
-				if(contracts[temp].compareTo(contracts[j]) >0)
-					temp = j;
-			if(temp != i) {
-			Contract c = contracts[temp];
-			contracts[temp] = contracts[i];
-			contracts[i] = c;
-			}
-		}
-	}
-	/*
-	 * 添加联系人
-	 * 首先查询是否包含，包含则合并
-	 * 不包含该联系人，则添加。
-	 */
-	private int findContract(Contract c) {
-		for(int i = 0; i <contracts.length; i++) {
-			if(contracts[i].getName().equals(c.getName())) {
-				return i;
-			}
-		}
-		return -1;
-	}
-	public void add(Contract c) {
-		
+	public void setContracts(List<Contract> contracts) {					
+		Collections.sort(contracts);
+		this.contracts = contracts;	
+	}	
+	
+	public void add(Contract c) {		
 		if(contracts == null) {
-			contracts = new Contract[1];
-			contracts[0] = c;
+			contracts = new ArrayList<Contract>();
+			contracts.add(c);
 			return;
 		}
-		int index = findContract(c);
-		if(index <0) {	
-			//添加操作		
-			//扩容
-			Contract[] contractAdded = Arrays.copyOf(contracts, contracts.length + 1);
-			contractAdded[contractAdded.length-1] = c;			
-			this.setContracts(contractAdded);
+		/*受compareTo方法影响
+		 * 
+		 */
+		int index = Collections.binarySearch(this.getContracts(), c);
+		
+		if(index <0){
+			
+				contracts.add(-index-1, c);
 			return;
-		}else
-			contracts[index].mergeContract(c);
+		}
+		else
+			contracts.get(index).mergeContract(c);
 		
 		
 	}
-	public boolean delete(Contract c) {		
-		int index = findContract(c);
-		if(index < 0)
-			return false;
-		Contract[] contractDeleted = new Contract[contracts.length-1];		
-		System.arraycopy(contracts, 0, contractDeleted, 0, index);
-		System.arraycopy(contracts, index+1, contractDeleted, index, contracts.length-1-index);
-		contracts = contractDeleted;		
-		return true;
+	public boolean delete(Contract c) {	
+		/*删除之前的查询，使用equals方法，所以要先重写该方法。
+		 * 当然，这个方法也可以在查询之后再调用，保证引用相等的前提下使用，这样就可以不用重写equals方法。
+		 */
+		return contracts.remove(c);		
 	}
 	/*
 	 * 模糊查询
 	 */
-	public Contract[] findNameContains(String name) {
-		Contract[] result = new Contract[contracts.length];
-		int num = 0;
-		for(int i = 0; i < contracts.length; i++) {
-			if(contracts[i].getName().contains(name))
-				result[num++] = contracts[i];			
+	public List<Contract> findNameContains(String name) {
+		List<Contract> result = new ArrayList<Contract>();
+		Iterator<Contract> iter = contracts.iterator();
+		while(iter.hasNext()) {
+			Contract c = iter.next();
+			if(c.getName().contains(name))
+				result.add(c);
 		}
-		return Arrays.copyOf(result, num);
+		return result;
 	}
 	/*
 	 * 显示通讯录
 	 */
 	public void display() {
-		for(int i = 0; i < contracts.length; i++) {
-			contracts[i].display();			
+		for(int i = 0; i < contracts.size(); i++) {
+			contracts.get(i).display();			
 		}
 	}
 	public boolean updateContract(String name, String gender, 
-			String email, String[] phones) throws Exception {
-		int index = findContract(new Contract(name,gender,email,phones));		
+			String email, List<String> phones) throws Exception {
+		int index = Collections.binarySearch(contracts, new Contract(name,gender,email,phones));		
 		if(index <0)
 			return false;
-		contracts[index].setGender(gender);
-		contracts[index].setEmail(email);
-		contracts[index].setPhones(phones);
+		contracts.get(index).setGender(gender);
+		contracts.get(index).setEmail(email);
+		contracts.get(index).setPhones(phones);
 		return true;		
 	}
 	public void clearContracts() {
-		contracts = null;
+		contracts.clear();
 	}
 }

@@ -1,7 +1,7 @@
 package cn.edu.sdtbu.phoneBook;
 
 import java.text.Collator;
-import java.util.Arrays;
+import java.util.*;
 import java.util.regex.Pattern;
 class NameException extends Exception{
 	public NameException() {
@@ -23,15 +23,15 @@ class PhoneException extends Exception{
 		super("电话号码格式错误");
 	}
 }
-public class Contract{
+public class Contract implements Comparable<Contract>{
 	private String name;
 	private String gender;
 	private String email;
-	private String[] phones;	
+	private List<String> phones;	
 	public Contract() {
 		
 	}
-	public Contract(String name, String gender, String email,String[] phones){
+	public Contract(String name, String gender, String email,List<String> phones){
 		try {
 			setName(name);
 			setGender(gender);
@@ -41,7 +41,7 @@ public class Contract{
 			e.printStackTrace();
 		}
 	}
-	public Contract(String name, String[] phones){
+	public Contract(String name, List<String> phones){
 		this(name,"","",phones);
 	}	
 	public String getName() {
@@ -80,10 +80,10 @@ public class Contract{
 			throw new EmailException();
 			
 	}
-	public String[] getPhones() {
+	public List<String> getPhones() {
 		return phones;
 	}	
-	public void setPhones(String[] phones) throws PhoneException{	
+	public void setPhones(List<String> phones) throws PhoneException{	
 		String telReg = "^(0[1-9]\\d{1,2}\\-)?\\d{7,8}$";
 		String phoneReg = "^1\\d{10}$";
 		for(String phone:phones)
@@ -94,23 +94,31 @@ public class Contract{
 	public void display() {
 		System.out.println("姓名："+getName()+"\t性别："+getGender()+"\te-mail："+getEmail());
 		System.out.print("联系电话：\t");
-		for(int i = 0; i < phones.length;i++){
-			System.out.print(phones[i]+"\t");			
+		for(String phone:phones){
+			System.out.print(phone+"\t");			
 		}
 		System.out.println();
 	}
 	public static void main(String[] args) {
 		Contract c;
+		List<String> list = new ArrayList<String>();
+		list.add("13602344578");
+		list.add("13506334789");
+		list.add("010-34567913");
 		try {
-			c = new Contract("王新明", new String[] {"13602344578","13506334789","010-34567913"});
+			c = new Contract("王新明", list);
 		} catch (Exception e) {			
 			e.printStackTrace();
 			return;
 		}
 		c.display();	
 		Contract cNew;
+		List<String> listNew = new ArrayList<String>();
+		listNew.add("13602344578");
+		listNew.add("13506334788");
+		listNew.add("010-34567914");
 		try {
-			cNew = new Contract("王新明", new String[] {"13602344578","13506334788","0535-34567914"});
+			cNew = new Contract("王新明", listNew);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,9 +127,19 @@ public class Contract{
 		c.mergeContract(cNew);
 		c.display();
 	}
+	@Override
 	public int compareTo(Contract o) {		
 		Collator instance = Collator.getInstance(java.util.Locale.CHINA);
 		return  instance.compare(this.getName(),o.getName());
+	}
+	public boolean equals(Object obj) {
+		if(this == obj)
+			return true;
+		if(obj != null && Contract.class.isAssignableFrom(obj.getClass())) {
+			Contract c = (Contract)obj;
+			return this.getName().equals(c.getName());
+		}
+		return false;			
 	}
 	/*
 	 * 合并通讯录中的两条记录
@@ -145,31 +163,9 @@ public class Contract{
 			/*
 			 * 复制并去重
 			 */
-			boolean flag;
-			String[] newPhones = new String[o.getPhones().length];
-			int count = 0;
-			for(int j = 0; j < o.getPhones().length; j++) {
-				flag = true;
-				for(int i = 0; i < this.getPhones().length; i++) {
-					if(o.getPhones()[j].equals(this.getPhones()[i])) {
-						flag = false;
-						break;
-					}
-				}		
-				if(flag) 
-				{
-				/*
-				 * 添加
-				 */
-					newPhones[count++] = o.getPhones()[j];
-				}
-			}
-			int position = phones.length;
-			//扩容
-			phones = Arrays.copyOf(phones, phones.length+count);			
-			//newPhones追加在当前phones后面
-			System.arraycopy(newPhones, 0, phones, position, count);
-			
+			List<String> srcPhones = this.getPhones();			
+			srcPhones.removeAll(o.getPhones());
+			srcPhones.addAll(o.getPhones());
 		}
 	}
 }

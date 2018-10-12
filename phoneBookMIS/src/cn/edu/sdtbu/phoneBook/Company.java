@@ -1,6 +1,6 @@
 package cn.edu.sdtbu.phoneBook;
 
-public class Company {
+public class Company{
 	private String name;
 	private String address;
 	private String phone;
@@ -42,4 +42,5 @@ public class Company {
 		return String.format("%s\t地址:%s\n联系电话：%s\t传真:%s\n", this.getName(),this.getAddress()
 				,this.getPhone(), this.getFax());
 	}
+	
 }

@@ -1,5 +1,7 @@
 package cn.edu.sdtbu.phoneBook;
 
+import java.util.List;
+
 public class Partner extends Contract {
 	private String title;
 	private Company company;
@@ -18,11 +20,11 @@ public class Partner extends Contract {
 	public Partner() {
 		
 	}
-	public Partner(String name, String[] phones) {
+	public Partner(String name, List<String> phones) {
 		super(name, phones);		
 	}
 	public Partner(String name, String gender, String email, 
-			String[] phones, String title, Company company) {
+			List<String> phones, String title, Company company) {
 		super(name, gender, email, phones);
 		setCompany(company);
 		setTitle(title);

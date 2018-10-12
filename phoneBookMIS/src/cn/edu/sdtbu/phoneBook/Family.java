@@ -1,6 +1,7 @@
 package cn.edu.sdtbu.phoneBook;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class Family extends Contract {
 	private java.util.Date birthday;
@@ -8,11 +9,11 @@ public class Family extends Contract {
 	public Family() {
 		
 	}
-	public Family(String name, String[] phones) {
+	public Family(String name, List<String> phones) {
 		super(name, phones);		
 	}
 	public Family(String name, String gender, String email, 
-			String[] phones,java.util.Date birthday, String address) {
+			List<String> phones,java.util.Date birthday, String address) {
 		super(name, gender, email, phones);
 		setBirthday(birthday);
 		setAddress(address);
