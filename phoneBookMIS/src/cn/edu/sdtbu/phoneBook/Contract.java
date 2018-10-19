@@ -132,7 +132,7 @@ public class Contract implements Comparable<Contract>{
 		Collator instance = Collator.getInstance(java.util.Locale.CHINA);
 		return  instance.compare(this.getName(),o.getName());
 	}
-	public boolean equals(Object obj) {
+	/*public boolean equals(Object obj) {
 		if(this == obj)
 			return true;
 		if(obj != null && Contract.class.isAssignableFrom(obj.getClass())) {
@@ -140,7 +140,7 @@ public class Contract implements Comparable<Contract>{
 			return this.getName().equals(c.getName());
 		}
 		return false;			
-	}
+	}*/
 	/*
 	 * 合并通讯录中的两条记录
 	 */
@@ -167,5 +167,8 @@ public class Contract implements Comparable<Contract>{
 			srcPhones.removeAll(o.getPhones());
 			srcPhones.addAll(o.getPhones());
 		}
+	}
+	public String toString() {
+		return this.getName();
 	}
 }

@@ -100,6 +100,15 @@ public class PhoneBook {
 		contracts.get(index).setPhones(phones);
 		return true;		
 	}
+	public boolean updateContract(Contract c) throws Exception {
+		int index = Collections.binarySearch(contracts, c);		
+		if(index <0)
+			return false;
+		contracts.get(index).setGender(c.getGender());
+		contracts.get(index).setEmail(c.getEmail());
+		contracts.get(index).setPhones(c.getPhones());
+		return true;		
+	}
 	public void clearContracts() {
 		contracts.clear();
 	}
