@@ -1,4 +1,4 @@
-package cn.edu.sdtbu.phoneBook;
+package cn.edu.sdtbu.phoneBook.bean;
 
 public class Company{
 	private String name;

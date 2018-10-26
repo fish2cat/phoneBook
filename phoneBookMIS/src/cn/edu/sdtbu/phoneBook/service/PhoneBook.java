@@ -1,6 +1,8 @@
-package cn.edu.sdtbu.phoneBook;
+package cn.edu.sdtbu.phoneBook.service;
 
 import java.util.*;
+
+import cn.edu.sdtbu.phoneBook.bean.Contract;
 /*实现一个通讯录；
 
 通讯录可以用来存储联系人的信息，每个人的信息包括：

@@ -1,10 +1,7 @@
-package cn.edu.sdtbu.phoneBook;
-
+package cn.edu.sdtbu.phoneBook.gui;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,7 +9,9 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
-import cn.edu.sdtbu.phoneBook.customStyle.*;
+import cn.edu.sdtbu.phoneBook.bean.*;
+import cn.edu.sdtbu.phoneBook.gui.customStyle.*;
+
 
 
 public class ContractDetailGUI extends JDialog {
@@ -38,8 +37,7 @@ public class ContractDetailGUI extends JDialog {
 		super(father,"",true);
 		this.owner = father;
 		this.contract = father.getCurrentContract();	
-		initComponent();				
-		//JPanel base = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		initComponent();		
 		Box base = new Box(BoxLayout.Y_AXIS);
 		TitledBorder border = BorderFactory.createTitledBorder("基本信息");
 		border.setTitleFont(f);
@@ -179,6 +177,7 @@ public class ContractDetailGUI extends JDialog {
 					tfdAddr.setText("");
 					tfdBirth.setText("");
 					setFamilyEnable(false);
+					
 				}
 			}
 			

@@ -1,4 +1,4 @@
-package cn.edu.sdtbu.phoneBook.customStyle;
+package cn.edu.sdtbu.phoneBook.gui.customStyle;
 
 import java.awt.Font;
 

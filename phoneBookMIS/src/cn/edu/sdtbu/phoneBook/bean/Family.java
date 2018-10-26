@@ -1,4 +1,4 @@
-package cn.edu.sdtbu.phoneBook;
+package cn.edu.sdtbu.phoneBook.bean;
 
 import java.text.SimpleDateFormat;
 import java.util.List;

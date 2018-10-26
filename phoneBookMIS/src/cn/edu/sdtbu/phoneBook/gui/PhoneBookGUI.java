@@ -1,4 +1,4 @@
-package cn.edu.sdtbu.phoneBook;
+package cn.edu.sdtbu.phoneBook.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -11,16 +11,21 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import cn.edu.sdtbu.phoneBook.customStyle.ButtonFont;
-import cn.edu.sdtbu.phoneBook.customStyle.ListFont;
-import cn.edu.sdtbu.phoneBook.customStyle.StyleArgument;
-import cn.edu.sdtbu.phoneBook.customStyle.TextFieldFont;
+import cn.edu.sdtbu.phoneBook.bean.Company;
+import cn.edu.sdtbu.phoneBook.bean.Contract;
+import cn.edu.sdtbu.phoneBook.bean.Family;
+import cn.edu.sdtbu.phoneBook.bean.Partner;
+import cn.edu.sdtbu.phoneBook.gui.customStyle.ButtonFont;
+import cn.edu.sdtbu.phoneBook.gui.customStyle.ListFont;
+import cn.edu.sdtbu.phoneBook.gui.customStyle.StyleArgument;
+import cn.edu.sdtbu.phoneBook.gui.customStyle.TextFieldFont;
+import cn.edu.sdtbu.phoneBook.service.PhoneBook;
 
 public class PhoneBookGUI extends JFrame {
-	private PhoneBook phoneData;
+	private PhoneBook phoneService;
 	private Contract currentContract;
+	private ListFont phoneList;
 	private DefaultListModel<Contract> listModel;
-
 	{
 		Vector<Contract> c = new Vector<Contract>();
 		List<String> list1 = new ArrayList<String>();
@@ -63,7 +68,21 @@ public class PhoneBookGUI extends JFrame {
 		list6.add("13507894555");
 		list6.add("0531-3456993");
 		c.add(new Contract("Jackson", list6));
-		phoneData = new PhoneBook(c);
+		List<String> list7 = new ArrayList<String>();
+		list7.add("13602344578");
+		list7.add("13506334789");
+		list7.add("010-34567913");
+		c.add(new Contract("章熙",list7));
+		List<String> list8 = new ArrayList<String>();
+		list8.add("13602344578");		
+		c.add(new Contract("赵若曦",list8));
+		List<String> list9 = new ArrayList<String>();
+		list9.add("13602344578");		
+		c.add(new Contract("宋佳辰",list9));
+		List<String> list10 = new ArrayList<String>();
+		list10.add("13602344578");		
+		c.add(new Contract("徐天普",list10));
+		phoneService = new PhoneBook(c);
 	}
 	public PhoneBookGUI() {
 		super("通讯录");
@@ -75,10 +94,10 @@ public class PhoneBookGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!tfdSearch.getText().equals("")) {
-					List<Contract> founded = phoneData.findNameContains(tfdSearch.getText());
+					List<Contract> founded = phoneService.findNameContains(tfdSearch.getText());
 					freshListModel(founded);
 					}else
-						freshListModel(phoneData.getContracts());
+						freshListModel(phoneService.getContracts());
 			}
 		});
 		ButtonFont btnAdd = new ButtonFont("+",f);
@@ -89,41 +108,40 @@ public class PhoneBookGUI extends JFrame {
 				//PhoneBookGUI.this.setCurrentContract(phoneData.getContracts().get(3));
 				PhoneBookGUI.this.setCurrentContract(null);
 				new ContractDetailGUI(PhoneBookGUI.this);
-				phoneData.add(getCurrentContract());		
-				listModel.addElement(getCurrentContract());
+				Contract c = getCurrentContract();
+				if(c != null) {
+				phoneService.add(c);
+				//要求按照姓名排序，不能直接listModel.addElement()方法
+				PhoneBookGUI.this.freshListModel(phoneService.getContracts());
+				}
 			}
 			
 		});
 		ButtonFont btnDel = new ButtonFont("-",f);
-		btnDel.addActionListener(new ActionListener() {
+		btnDel.addActionListener(new ActionListener() {			
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Contract delContract = getCurrentContract();
+				//Contract delContract = getCurrentContract();
+				Contract delContract = phoneList.getSelectedValue();
 				if(null==delContract) {
 					JOptionPane.showMessageDialog(PhoneBookGUI.this, "请选中待删除联系人", "删除", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				phoneData.delete(delContract);
+				if(JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(PhoneBookGUI.this, "确认删除联系人吗?")) {
+				
+				phoneService.delete(delContract);
 				listModel.removeElement(delContract);
-				setCurrentContract(null);
-			}
-			
+				//setCurrentContract(null);
+				}
+			}			
 		});
 		top.add(tfdSearch);
 		top.add(btnAdd);
 		top.add(btnDel);
 		listModel = new DefaultListModel<Contract>();
-		freshListModel(phoneData.getContracts());		
-		ListFont phoneList = new ListFont(listModel,f);
-		phoneList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				//选中的进行操作
-				if(phoneList.getValueIsAdjusting())
-					setCurrentContract(phoneList.getSelectedValue());				
-			}			
-		});
+		freshListModel(phoneService.getContracts());		
+		phoneList = new ListFont(listModel,f);		
 		phoneList.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -133,7 +151,7 @@ public class PhoneBookGUI extends JFrame {
 					new ContractDetailGUI(PhoneBookGUI.this);
 					Contract updatedContract = getCurrentContract();
 				try {
-					phoneData.updateContract(updatedContract);
+					phoneService.updateContract(updatedContract);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
