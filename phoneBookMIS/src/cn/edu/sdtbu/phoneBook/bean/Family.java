@@ -9,15 +9,16 @@ public class Family extends Contract {
 	public Family() {
 		
 	}
-	public Family(String name, List<String> phones) {
-		super(name, phones);		
+	public Family(int id,String name, List<String> phones) {
+		super(id,name, phones);		
 	}
-	public Family(String name, String gender, String email, 
+	public Family(int id,String name, String gender, String email, 
 			List<String> phones,java.util.Date birthday, String address) {
-		super(name, gender, email, phones);
+		super(id,name, gender, email, phones);
 		setBirthday(birthday);
 		setAddress(address);
 	}	
+	
 	public java.util.Date getBirthday() {
 		return birthday;
 	}

@@ -33,6 +33,8 @@ public class ContractDetailGUI extends JDialog {
 	private TextFieldFont companyFax;
 	private Font f;
 	private Box palPhone;
+	private int contractId;
+	private int companyId;
 	public ContractDetailGUI(PhoneBookGUI father) {
 		super(father,"",true);
 		this.owner = father;
@@ -87,23 +89,24 @@ public class ContractDetailGUI extends JDialog {
 				if(chkFamily.isSelected()) {
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 					java.util.Date birthday = null;
+					if(tfdBirth.getText()!= null && !tfdBirth.getText().equals("")) {
 					try {
 						birthday = sdf.parse(tfdBirth.getText());
 					} catch (ParseException e1) {						
 						e1.printStackTrace();
-					}
-					Family f = new Family(tfdName.getText(),tfdGender.getText(),tfdEmail.getText(),
+					}}
+					Family f = new Family(contractId,tfdName.getText(),tfdGender.getText(),tfdEmail.getText(),
 							phones,birthday,tfdAddr.getText());					
 					ContractDetailGUI.this.owner.setCurrentContract(f);					
 					return;
 				}
 				if(chkPartner.isSelected()) {
-					Partner p = new Partner(tfdName.getText(),tfdGender.getText(),tfdEmail.getText(),phones,title.getText(),
-							new Company(companyName.getText(),companyAddr.getText(),companyPhone.getText(),companyFax.getText()));
+					Partner p = new Partner(contractId,tfdName.getText(),tfdGender.getText(),tfdEmail.getText(),phones,title.getText(),
+							new Company(companyId,companyName.getText(),companyAddr.getText(),companyPhone.getText(),companyFax.getText()));
 					ContractDetailGUI.this.owner.setCurrentContract(p);
 					return;
 				}
-				Contract c = new Contract(tfdName.getText(),tfdGender.getText(),tfdEmail.getText(),phones);
+				Contract c = new Contract(contractId,tfdName.getText(),tfdGender.getText(),tfdEmail.getText(),phones);
 				ContractDetailGUI.this.owner.setCurrentContract(c);
 				return;
 			}			
@@ -112,6 +115,8 @@ public class ContractDetailGUI extends JDialog {
 		btnClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				contractId = 0;
+				companyId = 0;
 				tfdName.setText("");
 				tfdGender.setText("");
 				tfdEmail.setText("");
@@ -171,6 +176,7 @@ public class ContractDetailGUI extends JDialog {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				if(chkFamily.isSelected()) {
+					companyId = 0;
 					chkPartner.setSelected(false);
 					setFamilyEnable(true);					
 				}else {
@@ -209,7 +215,8 @@ public class ContractDetailGUI extends JDialog {
 		companyAddr = new TextFieldFont(20,f);
 		companyFax = new TextFieldFont(12,f);
 		setPartnerEnable(false);
-		if(contract != null) {					
+		if(contract != null) {	
+			contractId = contract.getId();
 			tfdName.setText(contract.getName());
 			if(contract.getGender()!=null || !contract.getGender().equals(""))
 				tfdGender.setText(contract.getGender());
@@ -219,7 +226,7 @@ public class ContractDetailGUI extends JDialog {
 				tfdPhones.add(new TextFieldFont(p,12,f));	
 			if(contract instanceof Family) {
 				chkFamily.setSelected(true);
-				if(((Family) contract).getAddress()!=null || !((Family) contract).getAddress().equals(""))
+				if(((Family) contract).getAddress()!=null && !((Family) contract).getAddress().equals(""))
 					tfdAddr.setText(((Family) contract).getAddress());
 				if(((Family) contract).getBirthday()!=null) {
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -228,16 +235,17 @@ public class ContractDetailGUI extends JDialog {
 				setFamilyEnable(true);
 			}
 			if(contract instanceof Partner) {
+				companyId = ((Partner) contract).getCompany().getId();
 				chkPartner.setSelected(true);
 				if(((Partner) contract).getTitle()!= null || ((Partner) contract).getTitle().equals(""))
 					title.setText(((Partner) contract).getTitle());
-				if(((Partner) contract).getCompany().getName()!= null || ((Partner) contract).getCompany().getName().equals(""))
+				if(((Partner) contract).getCompany().getName()!= null &&! ((Partner) contract).getCompany().getName().equals(""))
 					companyName.setText(((Partner) contract).getCompany().getName());
-				if(((Partner) contract).getCompany().getPhone()!= null || ((Partner) contract).getCompany().getPhone().equals(""))
+				if(((Partner) contract).getCompany().getPhone()!= null &&!((Partner) contract).getCompany().getPhone().equals(""))
 					companyPhone.setText(((Partner) contract).getCompany().getPhone());
-				if(((Partner) contract).getCompany().getAddress()!= null || ((Partner) contract).getCompany().getAddress().equals(""))
+				if(((Partner) contract).getCompany().getAddress()!= null && !((Partner) contract).getCompany().getAddress().equals(""))
 					companyAddr.setText(((Partner) contract).getCompany().getAddress()); 
-				if(((Partner) contract).getCompany().getFax()!= null || ((Partner) contract).getCompany().getFax().equals(""))
+				if(((Partner) contract).getCompany().getFax()!= null &&! ((Partner) contract).getCompany().getFax().equals(""))
 					companyFax.setText(((Partner) contract).getCompany().getFax()); 
 				setPartnerEnable(true);
 			}

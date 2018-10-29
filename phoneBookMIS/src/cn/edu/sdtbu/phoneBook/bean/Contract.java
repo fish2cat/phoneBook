@@ -24,6 +24,7 @@ class PhoneException extends Exception{
 	}
 }
 public class Contract implements Comparable<Contract>{
+	private int id;
 	private String name;
 	private String gender;
 	private String email;
@@ -31,8 +32,9 @@ public class Contract implements Comparable<Contract>{
 	public Contract() {
 		
 	}
-	public Contract(String name, String gender, String email,List<String> phones){
+	public Contract(int id,String name, String gender, String email,List<String> phones){
 		try {
+			setId(id);
 			setName(name);
 			setGender(gender);
 			setEmail(email);		
@@ -41,9 +43,15 @@ public class Contract implements Comparable<Contract>{
 			e.printStackTrace();
 		}
 	}
-	public Contract(String name, List<String> phones){
-		this(name,"","",phones);
+	public Contract(int id,String name, List<String> phones){
+		this(id,name,"","",phones);
 	}	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public String getName() {
 		return name;
 	}
@@ -106,7 +114,7 @@ public class Contract implements Comparable<Contract>{
 		list.add("13506334789");
 		list.add("010-34567913");
 		try {
-			c = new Contract("王新明", list);
+			c = new Contract(1,"王新明", list);
 		} catch (Exception e) {			
 			e.printStackTrace();
 			return;
@@ -118,7 +126,7 @@ public class Contract implements Comparable<Contract>{
 		listNew.add("13506334788");
 		listNew.add("010-34567914");
 		try {
-			cNew = new Contract("王新明", listNew);
+			cNew = new Contract(1,"王新明", listNew);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

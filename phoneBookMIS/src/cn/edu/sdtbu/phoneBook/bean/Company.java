@@ -1,6 +1,7 @@
 package cn.edu.sdtbu.phoneBook.bean;
 
 public class Company{
+	private int id;
 	private String name;
 	private String address;
 	private String phone;
@@ -8,11 +9,18 @@ public class Company{
 	public Company() {
 		
 	}
-	public Company(String name, String address, String phone, String fax) {		
+	public Company(int id,String name, String address, String phone, String fax) {		
+		this.setId(id);
 		this.setName(name);
 		this.setAddress(address);
 		this.setPhone(phone);
 		this.setFax(fax);
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	public String getName() {
 		return name;
