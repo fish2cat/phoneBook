@@ -47,8 +47,7 @@ public class Company{
 		this.fax = fax;
 	}
 	public String toString() {
-		return String.format("%s\t地址:%s\n联系电话：%s\t传真:%s\n", this.getName(),this.getAddress()
-				,this.getPhone(), this.getFax());
+		return String.format("%s", this.getName());
 	}
 	
 }

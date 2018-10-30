@@ -1,25 +1,21 @@
 package cn.edu.sdtbu.phoneBook.gui;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 import cn.edu.sdtbu.phoneBook.bean.*;
+import cn.edu.sdtbu.phoneBook.dao.*;
 import cn.edu.sdtbu.phoneBook.gui.customStyle.*;
-
-
 
 public class ContractDetailGUI extends JDialog {
 	private PhoneBookGUI owner;
 	private TextFieldFont tfdName;
 	private TextFieldFont tfdGender;
 	private TextFieldFont tfdEmail;
-	private List<TextFieldFont> tfdPhones;
+	private java.util.List<TextFieldFont> tfdPhones;
 	private Contract contract;
 	private ButtonFont btnAdd;
 	private CheckBoxFont chkFamily;
@@ -27,7 +23,8 @@ public class ContractDetailGUI extends JDialog {
 	private TextFieldFont tfdBirth;
 	private CheckBoxFont chkPartner;
 	private TextFieldFont title;
-	private TextFieldFont companyName;
+	private ComboBoxFont companyName;
+	private Vector<Company> companies;
 	private TextFieldFont companyAddr;
 	private TextFieldFont companyPhone;
 	private TextFieldFont companyFax;
@@ -35,6 +32,7 @@ public class ContractDetailGUI extends JDialog {
 	private Box palPhone;
 	private int contractId;
 	private int companyId;
+	private String strCompanyName;
 	public ContractDetailGUI(PhoneBookGUI father) {
 		super(father,"",true);
 		this.owner = father;
@@ -61,6 +59,7 @@ public class ContractDetailGUI extends JDialog {
 		
 		//JPanel partner = new JPanel(new FlowLayout(FlowLayout.LEFT));	
 		Box partner = new Box(BoxLayout.Y_AXIS);
+		
 		//partner.setBorder(BorderFactory.createRaisedBevelBorder());	
 		partner.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 		partner.add(chkPartner);
@@ -81,7 +80,7 @@ public class ContractDetailGUI extends JDialog {
 		btnSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				List<String> phones =  new ArrayList<String>();
+				java.util.List<String> phones =  new ArrayList<String>();
 				for(TextFieldFont p:tfdPhones) {
 					if(!p.getText().equals(""))
 						phones.add(p.getText());
@@ -102,7 +101,7 @@ public class ContractDetailGUI extends JDialog {
 				}
 				if(chkPartner.isSelected()) {
 					Partner p = new Partner(contractId,tfdName.getText(),tfdGender.getText(),tfdEmail.getText(),phones,title.getText(),
-							new Company(companyId,companyName.getText(),companyAddr.getText(),companyPhone.getText(),companyFax.getText()));
+							new Company(companyId,strCompanyName,companyAddr.getText(),companyPhone.getText(),companyFax.getText()));
 					ContractDetailGUI.this.owner.setCurrentContract(p);
 					return;
 				}
@@ -139,6 +138,30 @@ public class ContractDetailGUI extends JDialog {
 					ContractDetailGUI.this.dispose();				
 			}			
 		});
+		companyName.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(e.getActionCommand().equals("comboBoxEdited")) {
+					//输入新的
+					strCompanyName = (String)companyName.getEditor().getItem();
+					companyAddr.setText("");
+					companyPhone.setText("");
+					companyFax.setText("");					
+				}
+				if(e.getActionCommand().equals("comboBoxChanged")) {
+					if(companyName.getSelectedIndex() != -1) {
+					//选中
+					Company c = (Company)companyName.getSelectedItem();
+					strCompanyName = c.getName();
+					companyAddr.setText(c.getAddress());
+					companyPhone.setText(c.getPhone());
+					companyFax.setText(c.getFax());
+				}
+				}
+			}
+			
+		});
 		palCmd.add(btnSave);
 		palCmd.add(btnClear);
 		palCmd.add(btnRtn);
@@ -153,18 +176,51 @@ public class ContractDetailGUI extends JDialog {
 		
 		
 	}
-	private void setFamilyEnable(boolean isEnable) {
+	public void setFamilyEnable(boolean isEnable) {
 		tfdAddr.setEnabled(isEnable);
 		tfdBirth.setEnabled(isEnable);
 	}
-	private void setPartnerEnable(boolean isEnable) {
+	public void setPartnerEnable(boolean isEnable) {
 		title.setEnabled(isEnable);
 		companyName.setEnabled(isEnable);
 		companyAddr.setEnabled(isEnable);
 		companyPhone.setEnabled(isEnable);
 		companyFax.setEnabled(isEnable);
 	}
-	private void initComponent() {
+	public void initCompany() {
+		CompanyDao dao = new CompanyDaoImpl();		
+		companies = new Vector<Company>();
+		companies.add(new Company(-1,"请选择内容","","",""));
+		try {
+			companies.addAll(dao.searchByName(""));
+		} catch (Exception e1) {			
+			e1.printStackTrace();
+		}
+		if(companyName == null) {
+			companyName = new ComboBoxFont(companies,f);
+			//companyName.setEditable(true);
+		}
+		else {
+			companyName.removeAllItems();
+			for (Company p : companies) {
+				companyName.addItem(p);
+			}			
+		}
+		companyName.setEditable(true);
+		if(companyPhone == null)
+			companyPhone = new TextFieldFont(companies.get(0).getPhone(),f);
+		else
+			companyPhone.setText(companies.get(0).getPhone());
+		if(companyAddr == null)
+			companyAddr = new TextFieldFont(companies.get(0).getAddress(),f);
+		else
+			companyAddr.setText(companies.get(0).getAddress());
+		if(companyFax == null)
+			companyFax = new TextFieldFont(companies.get(0).getAddress(),f);
+		else
+			companyFax.setText(companies.get(0).getAddress());
+	}
+	private void initComponent(){
 		f = new Font(StyleArgument.FONTNAME,StyleArgument.FONTSTYLE,StyleArgument.FONTSIZE);
 		btnAdd = new ButtonFont("添加电话",f);			
 		tfdName = new TextFieldFont("姓名",10,f);		
@@ -193,16 +249,16 @@ public class ContractDetailGUI extends JDialog {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if(chkPartner.isSelected()) {
+				if(chkPartner.isSelected()) {					
 					chkFamily.setSelected(false);
 					setPartnerEnable(true);					
 				}else {
 					title.setText("");
-					companyName.setText("");
-					companyPhone.setText("");
-					companyAddr.setText("");
-					companyFax.setText("");
+					initCompany();
 					setPartnerEnable(false);
+					ContractDetailGUI.this.validate();
+					ContractDetailGUI.this.repaint();
+					
 				}					
 			}			
 		});
@@ -210,10 +266,7 @@ public class ContractDetailGUI extends JDialog {
 		tfdBirth = new TextFieldFont(10,f);
 		setFamilyEnable(false);
 		title = new TextFieldFont(5,f);
-		companyName = new TextFieldFont(10,f);
-		companyPhone = new TextFieldFont(12,f);
-		companyAddr = new TextFieldFont(20,f);
-		companyFax = new TextFieldFont(12,f);
+		initCompany();		
 		setPartnerEnable(false);
 		if(contract != null) {	
 			contractId = contract.getId();
@@ -237,10 +290,10 @@ public class ContractDetailGUI extends JDialog {
 			if(contract instanceof Partner) {
 				companyId = ((Partner) contract).getCompany().getId();
 				chkPartner.setSelected(true);
-				if(((Partner) contract).getTitle()!= null || ((Partner) contract).getTitle().equals(""))
+				if(((Partner) contract).getTitle()!= null && !((Partner) contract).getTitle().equals(""))
 					title.setText(((Partner) contract).getTitle());
-				if(((Partner) contract).getCompany().getName()!= null &&! ((Partner) contract).getCompany().getName().equals(""))
-					companyName.setText(((Partner) contract).getCompany().getName());
+				if(((Partner) contract).getCompany().getName()!= null && !((Partner) contract).getCompany().getName().equals(""))
+					companyName.setSelectedItem(((Partner) contract).getCompany());					
 				if(((Partner) contract).getCompany().getPhone()!= null &&!((Partner) contract).getCompany().getPhone().equals(""))
 					companyPhone.setText(((Partner) contract).getCompany().getPhone());
 				if(((Partner) contract).getCompany().getAddress()!= null && !((Partner) contract).getCompany().getAddress().equals(""))
