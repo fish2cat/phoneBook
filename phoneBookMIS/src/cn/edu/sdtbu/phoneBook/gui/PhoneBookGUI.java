@@ -27,13 +27,31 @@ public class PhoneBookGUI extends JFrame {
 	public PhoneBookGUI(){
 		super("Í¨Ñ¶Â¼");
 		ContractDao contractDao = new ContractDaoImpl();
-		CompanyDao companyDao = new CompanyDaoImpl();
-		
+		CompanyDao companyDao = new CompanyDaoImpl();		
 		ContractService conService = new ContractServImpl(contractDao,companyDao);
+		
 		Container c = this.getContentPane();
 		JPanel top = new JPanel();
 		Font f = new Font(StyleArgument.FONTNAME, StyleArgument.FONTSTYLE, StyleArgument.FONTSIZE);
 		TextFieldFont tfdSearch = new TextFieldFont("ËÑË÷", 20, f);
+		ButtonFont btnAdd = new ButtonFont("+", f);
+		ButtonFont btnDel = new ButtonFont("-", f);
+		top.add(tfdSearch);
+		top.add(btnAdd);
+		top.add(btnDel);		
+		listModel = new DefaultListModel<Contract>();
+		try {
+			freshListModel(conService.searchByName(""));
+		} catch (Exception e1) {			
+			e1.printStackTrace();
+		}		
+		phoneList = new ListFont(listModel, f);
+		c.add(top, BorderLayout.NORTH);
+		c.add(new JScrollPane(phoneList));
+		this.pack();
+		this.setVisible(true);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		tfdSearch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -46,7 +64,7 @@ public class PhoneBookGUI extends JFrame {
 				freshListModel(founded);
 			}
 		});
-		ButtonFont btnAdd = new ButtonFont("+", f);
+		
 		btnAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {				
@@ -56,7 +74,7 @@ public class PhoneBookGUI extends JFrame {
 				if (c != null) {										
 					try {
 						conService.addContract(c);
-						PhoneBookGUI.this.freshListModel(conService.searchByName(""));
+						PhoneBookGUI.this.freshListModel(conService.searchByName(tfdSearch.getText().equals("ËÑË÷")?"":tfdSearch.getText()));
 					} catch (Exception e1) {						
 						e1.printStackTrace();
 					}
@@ -64,7 +82,7 @@ public class PhoneBookGUI extends JFrame {
 			}
 
 		});
-		ButtonFont btnDel = new ButtonFont("-", f);
+		
 		btnDel.addActionListener(new ActionListener() {
 
 			@Override
@@ -79,54 +97,37 @@ public class PhoneBookGUI extends JFrame {
 				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(PhoneBookGUI.this, "È·ÈÏÉ¾³ýÁªÏµÈËÂð?")) {
 
 					try {
-						conService.deleteContract(delContract);
+						conService.deleteContractById(delContract.getId());
+						PhoneBookGUI.this.freshListModel(conService.searchByName(tfdSearch.getText().equals("ËÑË÷")?"":tfdSearch.getText()));
 					} catch (Exception e1) {
 						
 						e1.printStackTrace();
 					}
-					listModel.removeElement(delContract);					
+					//listModel.removeElement(delContract);						
 				}
 			}
-		});
-		top.add(tfdSearch);
-		top.add(btnAdd);
-		top.add(btnDel);
-		listModel = new DefaultListModel<Contract>();
-		try {
-			freshListModel(conService.searchByName(""));
-		} catch (Exception e1) {			
-			e1.printStackTrace();
-		}
-		phoneList = new ListFont(listModel, f);
-		phoneList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				PhoneBookGUI.this.setCurrentContract(phoneList.getSelectedValue());				
-			}			
-		});
+		});		
+		
 		phoneList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (arg0.getClickCount() == 2) {
-					int index = phoneList.getSelectedIndex();
+					PhoneBookGUI.this.setCurrentContract(phoneList.getSelectedValue());
+					//int index = phoneList.getSelectedIndex();
 					new ContractDetailGUI(PhoneBookGUI.this);
 					Contract updatedContract = getCurrentContract();
 					try {
 						conService.updateContract(updatedContract);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
+						PhoneBookGUI.this.freshListModel(conService.searchByName(tfdSearch.getText().equals("ËÑË÷")?"":tfdSearch.getText()));
+					} catch (Exception e) {						
 						e.printStackTrace();
 					}
-					listModel.set(index, updatedContract);
+					//listModel.set(index, updatedContract);
 				}
 			}
 
 		});
-		c.add(top, BorderLayout.NORTH);
-		c.add(new JScrollPane(phoneList));
-		this.pack();
-		this.setVisible(true);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 	}
 
 	public static void main(String[] args) {
