@@ -86,6 +86,8 @@ public class ContractDetailGUI extends JDialog {
 		c.add(base);
 		c.add(family);
 		c.add(partner);
+		
+		
 		c.add(palCmd);
 		
 
@@ -207,6 +209,7 @@ public class ContractDetailGUI extends JDialog {
 		}
 		if (companyName == null) {
 			companyName = new ComboBoxFont(companies, f);
+			companyName.setAlignmentX(Component.LEFT_ALIGNMENT);;
 		} else {
 			companyName.removeAllItems();
 			for (Company p : companies) {
@@ -215,15 +218,15 @@ public class ContractDetailGUI extends JDialog {
 		}
 		companyName.setEditable(true);
 		if (companyPhone == null)
-			companyPhone = new TextFieldFont(companies.get(0).getPhone(), f);
+			companyPhone = new TextFieldFont(companies.get(0).getPhone(),12,f);
 		else
 			companyPhone.setText(companies.get(0).getPhone());
 		if (companyAddr == null)
-			companyAddr = new TextFieldFont(companies.get(0).getAddress(), f);
+			companyAddr = new TextFieldFont(companies.get(0).getAddress(),20, f);
 		else
 			companyAddr.setText(companies.get(0).getAddress());
 		if (companyFax == null)
-			companyFax = new TextFieldFont(companies.get(0).getAddress(), f);
+			companyFax = new TextFieldFont(companies.get(0).getAddress(),13, f);
 		else
 			companyFax.setText(companies.get(0).getAddress());
 	}
