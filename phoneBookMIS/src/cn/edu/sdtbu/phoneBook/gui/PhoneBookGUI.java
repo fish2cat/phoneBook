@@ -18,6 +18,7 @@ import cn.edu.sdtbu.phoneBook.dao.*;
 import cn.edu.sdtbu.phoneBook.gui.customStyle.*;
 
 import cn.edu.sdtbu.phoneBook.service.*;
+import cn.edu.sdtbu.phoneBook.util.DBTool;
 
 public class PhoneBookGUI extends JFrame {	
 	private Contract currentContract;
@@ -49,6 +50,18 @@ public class PhoneBookGUI extends JFrame {
 		c.add(top, BorderLayout.NORTH);
 		c.add(new JScrollPane(phoneList));
 		this.pack();
+		this.addWindowListener(new WindowAdapter() {	
+			
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				DBTool.closeConnection();
+				
+			}
+
+			
+			
+		});
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
